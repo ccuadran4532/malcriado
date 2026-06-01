@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Malcriado">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/favicon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Gin Malcriado · Ventas</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="pantalla">
+  <div class="header">
+    <button class="navbtn" id="btnHist" title="Historial">🕘</button>
+    <img src="icons/icon-192.png" alt="Gin Malcriado" style="height:70px;border-radius:14px;">
+    <button class="gear" id="btnGear" title="Ajustes">⚙︎</button>
+  </div>
+
+  <div class="scroll" id="vistaVenta">
+    <div class="titulo">Nueva venta <small>Gin Malcriado · The Branican Company</small></div>
+
+    <div class="seg">
+      <button class="on" id="bBoleta" data-tipo="boleta">Boleta</button>
+      <button id="bFactura" data-tipo="factura">Factura</button>
+    </div>
+
+    <div class="campo">
+      <label>Producto</label>
+      <select id="producto"></select>
+    </div>
+
+    <div class="campo">
+      <label>Nombre del comprador</label>
+      <input type="text" id="nombre" placeholder="Ej: Restaurante La Mar" autocomplete="off">
+    </div>
+    <div class="campo" id="campoRut">
+      <label>RUT</label>
+      <input type="text" id="rut" placeholder="76.123.456-7" inputmode="text" autocomplete="off">
+    </div>
+    <div class="hint" id="hintRut">RUT inválido — revisa el dígito verificador.</div>
+
+    <div class="fila">
+      <div class="campo crece">
+        <label>Precio con IVA / botella <span class="precio-tag">editable</span></label>
+        <input type="text" id="precio" inputmode="numeric" value="$24.990">
+      </div>
+      <div class="campo angosto">
+        <label>Cantidad</label>
+        <div class="stepper">
+          <button type="button" id="menos">−</button>
+          <div class="val" id="cant">1</div>
+          <button type="button" id="mas">＋</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="switch-row">
+      <div class="info"><b>IVA 19%</b><span>Puedes agregarlo o sacarlo</span></div>
+      <label class="sw"><input type="checkbox" id="iva" checked><span class="track"></span><span class="dot"></span></label>
+    </div>
+
+    <div class="switch-row" id="rowIla">
+      <div class="info"><b>ILA 31,5%</b><span id="ilaNota">Impuesto adicional alcoholes</span></div>
+      <label class="sw"><input type="checkbox" id="ila" checked><span class="track"></span><span class="dot"></span></label>
+    </div>
+
+    <div class="resumen">
+      <div class="r"><span>Neto</span><b id="rNeto">$0</b></div>
+      <div class="r" id="rRowIla"><span>ILA 31,5%</span><b id="rIla">$0</b></div>
+      <div class="r"><span>IVA 19%</span><b id="rIva">$0</b></div>
+      <div class="total"><span>Total documento</span><b id="rTotal">$0</b></div>
+    </div>
+  </div>
+
+  <!-- Pantalla de Historial -->
+  <div class="scroll" id="vistaHistorial" style="display:none">
+    <div class="titulo">Historial <small id="histResumen">0 ventas</small></div>
+    <div class="buscador">
+      <span>🔎</span>
+      <input type="text" id="busca" placeholder="Buscar cliente, RUT, folio, monto…" autocomplete="off">
+      <button id="limpiaBusca" title="Borrar">✕</button>
+    </div>
+    <div id="listaHist"></div>
+    <div class="vacio" id="histVacio">Aún no hay ventas registradas.</div>
+  </div>
+
+  <div class="footer" id="footerVenta">
+    <button class="emitir" id="btn">Emitir Boleta</button>
+  </div>
+</div>
+
+<!-- Hoja de ajustes (conexión al cerebro) -->
+<div class="sheet" id="sheet">
+  <div class="card">
+    <h3>Conexión</h3>
+    <p>Pega aquí la dirección del cerebro en la nube (se configura una sola vez).</p>
+    <label>URL del servidor (Apps Script)</label>
+    <input type="url" id="apiUrl" placeholder="https://script.google.com/macros/s/.../exec">
+    <label>Clave secreta</label>
+    <input type="text" id="apiKey" placeholder="clave compartida">
+    <button class="guardar" id="guardar">Guardar y probar conexión</button>
+    <div class="estado" id="estadoConn"></div>
+  </div>
+</div>
+
+<!-- Confirmación antes de emitir (evita emitir por error) -->
+<div class="sheet" id="confirmSheet">
+  <div class="card">
+    <h3>¿Confirmas la venta?</h3>
+    <p>Revisa los datos. Solo se emite si tocas <b>Malcriados</b>.</p>
+    <div class="confirm-detalle">
+      <div><span>Documento</span><b id="cfDoc">Boleta</b></div>
+      <div><span>Cliente</span><b id="cfCli">—</b></div>
+      <div><span>Cantidad</span><b id="cfCant">1 botella</b></div>
+      <div class="cf-total"><span>Total</span><b id="cfTot">$0</b></div>
+    </div>
+    <button class="guardar" id="btnConfirmar">Malcriados&nbsp;✓</button>
+    <button class="cancelar-btn" id="btnCancelarEmision">Cancelar</button>
+  </div>
+</div>
+
+<!-- Ticket de confirmación (se sobrepone difuminando la venta) -->
+<div class="ticket-overlay" id="ticket">
+  <div class="ticket-card">
+    <img src="icons/icon-192.png" class="tk-logo" alt="">
+    <div class="tk-check">✓</div>
+    <div class="tk-titulo">¡Venta OK!</div>
+    <div class="tk-sub">Automatización ejecutada</div>
+    <div class="tk-linea"></div>
+    <div class="tk-row"><span>Documento</span><b id="tkDoc">Boleta</b></div>
+    <div class="tk-row"><span>Cliente</span><b id="tkCli">—</b></div>
+    <div class="tk-row"><span>Total</span><b id="tkTot">$0</b></div>
+    <div class="tk-linea dash"></div>
+    <div class="tk-pasos" id="tkPasos"></div>
+  </div>
+</div>
+
+<!-- Botella Malcriado (aparece tras el ticket y se desvanece) -->
+<div class="botella-overlay" id="botella">
+  <img class="botella-img" src="img/botella.png" alt="Gin Malcriado">
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
