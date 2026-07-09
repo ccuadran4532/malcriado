@@ -139,13 +139,20 @@
     toastT = setTimeout(() => (t.className = "toast"), 3200);
   }
 
-  // IVA e ILA siempre MOVIBLES (se pueden agregar/sacar). Solo cambia el valor por defecto:
-  // boleta: ILA apagado · factura: ILA encendido. El IVA queda encendido por defecto en ambos.
+  // REGLA (Carlos): TODA BOLETA va sin ILA. Solo las FACTURAS pueden llevar ILA,
+  // y solo cuando él lo enciende a mano. El IVA queda encendido por defecto en ambos.
   function actualizarIla() {
-    $("ila").disabled = false;
     $("iva").disabled = false;
-    $("ila").checked = (tipo === "factura");
-    $("ilaNota").textContent = "Puedes agregarlo o sacarlo";
+    if (tipo === "factura") {
+      $("ila").disabled = false;          // en factura el botón funciona
+      $("ila").checked = false;           // apagado por defecto; se enciende cuando corresponde
+      $("ilaNota").textContent = "Puedes agregarlo o sacarlo";
+    } else {
+      $("ila").checked = false;           // boleta: SIEMPRE sin ILA
+      $("ila").disabled = true;           // y no se puede encender
+      $("ilaNota").textContent = "Las boletas nunca llevan ILA";
+    }
+    calcular();
   }
 
   // --- Cambiar Boleta / Factura ---
@@ -215,7 +222,7 @@
       precio_neto: Math.round(calc.netoUnit * 100) / 100, // neto unitario (sin IVA) para Bsale
       precio_con_iva: calc.brutoUnit,                      // precio unitario digitado (con IVA)
       cantidad: cantidad,
-      aplica_ila: calc.aplicaIla,
+      aplica_ila: (tipo === "factura") ? calc.aplicaIla : false,   // BOLETA nunca lleva ILA
       aplica_iva: calc.aplicaIva,
       // El cerebro recalcula los impuestos por seguridad; esto es referencia:
       ref_total: Math.round(calc.total)
