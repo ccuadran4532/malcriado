@@ -1,6 +1,6 @@
 // Service worker mínimo: permite instalar la app. Como la emisión exige
 // internet, NO guardamos datos offline; solo cacheamos la interfaz.
-const CACHE = "malcriado-v24";
+const CACHE = "malcriado-v25";
 const ARCHIVOS = ["./", "./index.html", "./styles.css", "./app.js", "./config.js",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/favicon.png", "./img/botella.png", "./manifest.webmanifest"];
 

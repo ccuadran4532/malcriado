@@ -1,4 +1,32 @@
 /* App Gin Malcriado — lógica de ventas (diseño Indomable) */
+
+/* AUTO-REINSTALACIÓN (una sola vez): al abrir, borra TODO el estado viejo
+   —clave mala guardada, caché y service workers— y recarga la app limpia.
+   Así se "reinstala sola" sin que el usuario tenga que borrar nada. */
+(function autoReset() {
+  try {
+    if (localStorage.getItem("reset_v24") === "1") return;   // ya limpiada
+    try { localStorage.removeItem("api_key"); localStorage.removeItem("api_url"); } catch (e) {}
+    var terminar = function () {
+      try { localStorage.setItem("reset_v24", "1"); } catch (e) {}
+      location.reload();
+    };
+    var tareas = [];
+    if (window.caches && caches.keys) {
+      tareas.push(caches.keys().then(function (ks) {
+        return Promise.all(ks.map(function (k) { return caches.delete(k); }));
+      }));
+    }
+    if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+      tareas.push(navigator.serviceWorker.getRegistrations().then(function (rs) {
+        return Promise.all(rs.map(function (r) { return r.unregister(); }));
+      }));
+    }
+    if (tareas.length) { Promise.all(tareas).then(terminar).catch(terminar); }
+    else { try { localStorage.setItem("reset_v24", "1"); } catch (e) {} }
+  } catch (e) {}
+})();
+
 (function () {
   "use strict";
   const C = window.MALCRIADO_CONFIG;
