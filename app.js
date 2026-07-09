@@ -10,13 +10,18 @@
   let enviando = false;
   let ventaPendiente = null;
 
-  // --- Conexión guardada en el celular ---
+  // --- Conexión ---
+  // La clave/URL de fábrica (config.js) SIEMPRE mandan. Antes ganaba lo guardado
+  // en el teléfono, y una clave vieja con un carácter invisible tapaba la buena
+  // (daba "Clave incorrecta" sin forma fácil de arreglarlo). Ahora es a prueba de eso.
   const store = {
-    get url() { return localStorage.getItem("api_url") || C.API_URL_DEFAULT || ""; },
-    set url(v) { localStorage.setItem("api_url", v.trim()); },
-    get key() { return localStorage.getItem("api_key") || C.API_KEY_DEFAULT || ""; },
-    set key(v) { localStorage.setItem("api_key", v.trim()); },
+    get url() { return C.API_URL_DEFAULT || localStorage.getItem("api_url") || ""; },
+    set url(v) { localStorage.setItem("api_url", (v || "").trim()); },
+    get key() { return C.API_KEY_DEFAULT || localStorage.getItem("api_key") || ""; },
+    set key(v) { localStorage.setItem("api_key", (v || "").trim()); },
   };
+  // Auto-reparación: limpia cualquier clave/URL vieja que quedó guardada de antes.
+  try { localStorage.removeItem("api_key"); localStorage.removeItem("api_url"); } catch (e) {}
 
   // --- Utilidades ---
   const fmt = (n) => "$" + Math.round(n).toLocaleString("es-CL");
