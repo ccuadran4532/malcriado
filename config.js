@@ -3,7 +3,7 @@
 // pero puedes dejar aquí un valor por defecto cuando tengamos el cerebro listo.
 window.MALCRIADO_CONFIG = {
   // Cerebro en la nube (Google Apps Script) — ya desplegado:
-  API_URL_DEFAULT: "https://script.google.com/macros/s/AKfycbyroay_ISqGcQVMYRqrTUTULPDeus4jYi-bHbxXb8sYBk8qNfCRctrOYNLww6o04yq-fw/exec",
+  API_URL_DEFAULT: "https://script.google.com/macros/s/AKfycbzD5_awY5kYmhuKOUcmK5ewU4uSlPtstK74gzQsBxjPpzeqLu43iU-dyFS9YhcM6a01oA/exec",
   API_KEY_DEFAULT: "Malcriado-Branican-2026",
 
   // Productos de Bsale: id = VARIANTE real (afecta a IVA) que se envia a Bsale.
